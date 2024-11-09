@@ -1,6 +1,6 @@
 # TDEX Explorer
 
-![TDEX Explorer Logo](https://github.com/RayRizzling/tdex-explorer/public/logo.svg)
+![TDEX Explorer Logo](https://github.com/RayRizzling/tdex-explorer/blob/master/public/tdex-logo.png)
 
 Welcome to **TDEX Explorer**, an open-source initiative designed to foster user-centered development of the TDEX network. This repository serves as a core codebase for building and managing the **TDEX Dashboard**, a user-friendly interface for exploring and interacting with TDEX. 
 
