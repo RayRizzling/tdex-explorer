@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { ProviderSelector } from "./ProviderSelector"
 import ProviderMarketData from "./ProviderMarketData"
 import { ProviderSelectorSkeleton } from "./custom-skeletons"
@@ -17,6 +17,8 @@ import { Card, CardContent, CardHeader } from "./ui/card"
 import { BookOpenCheck, Cable, Globe } from "lucide-react"
 import { useProviderContext } from "@/context/ProviderContext"
 import { DashboardStatCardProps } from "@/types/types"
+import { Label } from "./ui/label"
+import { Switch } from "./ui/switch"
 
 // Dynamically import PinContainer to improve initial load time and avoid server-side rendering issues.
 const PinContainer = dynamic(() => import('./ui/3d-pin').then(mod => mod.PinContainer), {
@@ -36,6 +38,7 @@ export const words = [
  * Fetches and renders providers, dashboard statistics, and market data in a responsive layout.
  */
 const ProviderDashboard = () => {
+  const [showInSats, setShowInSats] = useState(false)
   const {
     providers,
     marketResults,
@@ -66,6 +69,22 @@ const ProviderDashboard = () => {
             <span className="text-xl md:text-2xl font-bold">Provider Dashboard</span>
           </AnimatedShinyText>
         </Badge>
+      </div>
+
+      {/* Toggle for Sats Display */}
+      <div className="justify-end mb-4 space-y-2 flex flex-col items-end">
+        <Label
+          htmlFor="sats-toggle"
+          className={`text-sm font-semibold ${showInSats ? 'dark:text-orange-400 text-orange-600' : ''}`}
+        >
+          {showInSats ? 'Sats' : 'Default'}
+        </Label>
+        <Switch
+          id="sats-toggle"
+          name="sats-toggle"
+          checked={showInSats}
+          onCheckedChange={setShowInSats}
+        />
       </div>
 
       {/* Provider Selector and Custom Provider Form */}
@@ -152,6 +171,7 @@ const ProviderDashboard = () => {
               error={errors.find((error) => error.endpoint === endpoint)}
               isDuplicate={duplicateMarkets.has(endpoint)}
               duplicateOf={duplicateMarkets.get(endpoint)}
+              showInSats={showInSats}
             />
           ))}
       </div>

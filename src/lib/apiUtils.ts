@@ -1,6 +1,6 @@
 // lib/apiUtils.ts
 
-import { ErrorObject, FetchMarketDataResponse, Market, MarketData, MarketError, PriceDetails, PriceResult, Provider, Results } from "@/types/types"
+import { ErrorObject, FetchMarketDataResponse, Market, MarketData, MarketError, MarketV1, PriceDetails, PriceResult, PriceV1Result, Provider, Results } from "@/types/types"
 import { debug, PROVIDER_URL } from "@/config/config"
 import fallbackData from '@/config/providers.json'
 import { fetchMarketData } from "./fetchFunctions"
@@ -197,6 +197,27 @@ export async function fetchAndProcessMarketData(endpoints: string[]): Promise<Re
         // Process the market data and fetch price details
         const markets: Market[] = marketData.data.markets
         const priceResults: PriceResult[] = await fetchPriceDataForMarkets(endpoint, markets)
+
+        for (const result of priceResults) {
+          if (result.price?.balance === undefined) {
+            const balances = await fetchBalanceDataForMarkets(endpoint, markets)
+        
+            // Füge die Balance-Daten zum Preis des result-Objekts hinzu
+            const balanceForMarket = balances.find(b => (b.market.baseAsset === result.market.baseAsset && b.market.quoteAsset === result.market.quoteAsset))
+            if (balanceForMarket && isPriceV1Result(balanceForMarket)) {
+              (result as PriceV1Result ).v1 = true
+              result.price = {
+                ...result.price,
+                spotPrice: result.price?.spotPrice ?? 0,
+                minTradableAmount: result.price?.minTradableAmount ?? 'N/A',
+                balance: {
+                  baseAmount: balanceForMarket.price?.balance.balance.baseAmount ?? 'N/A',
+                  quoteAmount: balanceForMarket.price?.balance.balance.quoteAmount ?? 'N/A'
+                }
+              }
+            }
+          }
+        }
   
         // Process and format the final market data with price details
         const data: MarketData[] = formatMarketData(markets, priceResults)
@@ -254,6 +275,33 @@ export async function fetchPriceDataForMarkets(endpoint: string, markets: Market
       })
     )
 }
+
+/**
+ * Fetches balance data for a list of markets at a specified endpoint.
+ * 
+ * This asynchronous function retrieves balance information for each market by
+ * making API requests to the given endpoint. It handles errors during the fetch 
+ * process by returning an error in the result object, allowing for graceful handling 
+ * of potential issues in network requests or API responses. Each market's balance 
+ * data, including asset amounts, is returned in a structured format.
+ * 
+ * @param {string} endpoint - The URL of the endpoint to fetch balance data from.
+ * @param {Market[]} markets - The list of markets for which to fetch balance data.
+ * 
+ * @returns {Promise<PriceResult[]>} A promise that resolves to an array of PriceResult
+ * objects, each containing balance data or an error if the fetch failed.
+ */
+export async function fetchBalanceDataForMarkets(endpoint: string, markets: Market[]): Promise<PriceResult[]> {
+  return Promise.all(
+    markets.map(async (market: Market) => {
+      const result: FetchMarketDataResponse = await fetchMarketData(endpoint, '/market/balance', market)
+      
+      return result.error
+        ? { market, price: null, error: result.error }
+        : { market, price: result.data as PriceDetails ?? null, error: null }
+    })
+  )
+}
   
 /**
  * Formats market data by adding relevant price details and fee information.
@@ -268,16 +316,37 @@ export async function fetchPriceDataForMarkets(endpoint: string, markets: Market
  * @returns {MarketData[]} A structured array of market data objects with price details.
 */
 function formatMarketData(markets: Market[], priceResults: PriceResult[]): MarketData[] {
-    return markets.map((market: Market) => {
-      const priceResult = priceResults.find(r => r.market === market)
-  
-      const baseAsset = priceResult?.market.market?.baseAsset ?? 'N/A'
-      const quoteAsset = priceResult?.market.market?.quoteAsset ?? 'N/A'
-      const baseAssetBalance = priceResult?.price?.balance?.baseAmount ?? 'N/A'
-      const quoteAssetBalance = priceResult?.price?.balance?.quoteAmount ?? 'N/A'
-      const spotPrice = priceResult?.price?.spotPrice ?? null
-      const minTradeableAmount = priceResult?.price?.minTradableAmount ?? 'N/A'
-  
+    return markets.map((market: Market | MarketV1) => {
+      const priceResult: PriceResult | PriceV1Result | undefined = priceResults.find(r => r.market === market)
+      
+      const baseAsset: string = priceResult?.market.market?.baseAsset ?? 'N/A'
+      const quoteAsset: string = priceResult?.market.market?.quoteAsset ?? 'N/A'
+      const baseAssetBalance: string = priceResult?.price?.balance?.baseAmount ?? 'N/A'
+      const quoteAssetBalance: string = priceResult?.price?.balance?.quoteAmount ?? 'N/A'
+      const spotPrice: number | null = priceResult?.price?.spotPrice ?? null
+      const minTradeableAmount: string = priceResult?.price?.minTradableAmount ?? 'N/A'
+      let baseFeeFixed: string = ''
+      let baseFeePercentage: string = ''
+      let quoteFeeFixed: string = ''
+      let quoteFeePercentage: string = ''
+      let v1: boolean | undefined = false
+
+      if (isMarketV1(market)) {
+        baseFeeFixed = market.fee.fixed.baseFee
+        baseFeePercentage = market.fee.basisPoint
+        quoteFeeFixed = market.fee.fixed?.quoteFee
+        quoteFeePercentage = market.fee.basisPoint
+      } else {
+        baseFeeFixed = market.fee.fixedFee.baseAsset
+        baseFeePercentage = market.fee.percentageFee.baseAsset
+        quoteFeeFixed = market.fee.fixedFee.quoteAsset
+        quoteFeePercentage = market.fee.percentageFee.quoteAsset
+      }
+
+      if (priceResult && isV1Result(priceResult)) {
+        v1 = priceResult.v1
+      }
+      
       return {
         baseAsset,
         quoteAsset,
@@ -288,10 +357,45 @@ function formatMarketData(markets: Market[], priceResults: PriceResult[]): Marke
         spotPrice,
         minTradeableAmount,
         fees: {
-          baseFee: { fixed: market.fee.fixedFee.baseAsset, percentage: market.fee.percentageFee.baseAsset },
-          quoteFee: { fixed: market.fee.fixedFee.quoteAsset, percentage: market.fee.percentageFee.quoteAsset },
+          baseFee: { fixed: baseFeeFixed, percentage: baseFeePercentage },
+          quoteFee: { fixed: quoteFeeFixed, percentage: quoteFeePercentage },
         },
+        v1: v1
       }
     })
+}
+
+/**
+ * Type guard function to check if a given market is of type MarketV1.
+ * 
+ * This function uses TypeScript's `is` keyword to refine the type of `market`.
+ * It checks for the presence of the `basisPoint` property within the `fee`
+ * object, a distinctive attribute of `MarketV1`. If the check is true, TypeScript
+ * will infer `market` as `MarketV1` within the scope where this function is called.
+ * 
+ * @param {Market | MarketV1} market - The market object to check.
+ * @returns {market is MarketV1} Returns true if the market is of type MarketV1.
+ */
+function isMarketV1(market: Market | MarketV1): market is MarketV1 {
+  return (market as MarketV1).fee.basisPoint !== undefined
+}
+
+/**
+ * Type guard function to check if a given price result is of type PriceV1Result.
+ * 
+ * This function verifies whether the provided `result` is of type `PriceV1Result` 
+ * by checking the presence of a nested `balance` property within the `price` object.
+ * Specifically, it looks for `balance.balance`, a unique property structure of `PriceV1Result`.
+ * If the condition is met, TypeScript infers `result` as `PriceV1Result` in the calling context.
+ * 
+ * @param {PriceResult | PriceV1Result} result - The price result object to check.
+ * @returns {result is PriceV1Result} Returns true if the result is of type PriceV1Result.
+ */
+function isPriceV1Result(result: PriceResult | PriceV1Result): result is PriceV1Result {
+  return (result as PriceV1Result).price?.balance?.balance !== undefined
+}
+
+function isV1Result(result: PriceResult | PriceV1Result): result is PriceV1Result {
+  return (result as PriceV1Result).v1 !== undefined
 }
   

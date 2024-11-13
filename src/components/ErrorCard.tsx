@@ -5,12 +5,29 @@
 import { ErrorObject } from '@/types/types'
 import { AlertCircle } from 'lucide-react'
 import React, { useState } from 'react'
+import { useToast } from './ui/use-toast'
 
 const ErrorCard: React.FC<{
     error: ErrorObject
     endpoint: string
 }> = ({ error, endpoint }) => {
     const [showError, setShowError] = useState(false)
+    const { toast } = useToast()
+
+    const copyToClipboard = (command: string) => {
+        navigator.clipboard.writeText(command).then(() => {
+            toast({
+                title: 'Command copied to clipboard!',
+                duration: 2500
+            })
+        }).catch(err => {
+          toast({
+            title: 'Failed to copy command:',
+            description: err,
+            duration: 2500
+          })
+        })
+      }
 
     return (
         <div className="mt-6 flex flex-col items-center justify-center">
@@ -31,11 +48,11 @@ const ErrorCard: React.FC<{
                     
                     <p className="text-foreground max-w-full">
                         <strong>Tip:</strong> Verify that the endpoint is reachable by pinging it in your console:
-                        <code className="block bg-accent text-accent-foreground p-2 mt-1 rounded font-semibold">
+                        <code onClick={() => copyToClipboard(`ping ${endpoint}`)} className="block cursor-pointer bg-accent text-accent-foreground p-2 mt-1 rounded font-semibold">
                             ping {endpoint}
                         </code>
                         or check with a tool like <code>curl</code> to see if a response is returned:
-                        <code className="block bg-accent text-accent-foreground p-2 mt-1 rounded font-semibold">
+                        <code onClick={() => copyToClipboard(`curl -I ${endpoint}`)} className="block cursor-pointer bg-accent text-accent-foreground p-2 mt-1 rounded font-semibold">
                             curl -I {endpoint}
                         </code>
                     </p>

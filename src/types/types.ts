@@ -32,6 +32,9 @@ export type MarketData = {
             percentage: string
         }
     }
+
+    /** True if provider uses TDEX v1 else false or undefined */
+    v1?: boolean
 }
 
 /**
@@ -119,6 +122,25 @@ export type PriceDetails = {
     }
 } | undefined
 
+export type PriceDetailsV1 = {
+    /** The spot price of the asset in the market */
+    spotPrice: number
+
+    /** The minimum amount that can be traded in the market */
+    minTradableAmount: string
+
+    /** The balance of the base and quote assets in the market */
+    balance: {
+        balance: { 
+            /** The amount of the base asset available */
+            baseAmount: string
+
+            /** The amount of the quote asset available */
+            quoteAmount: string
+        }
+    }
+} | undefined
+
 /**
  * PriceResult defines the structure of the result when fetching price data for a market.
  * It includes the market object, price details (or null if unavailable), and any error message.
@@ -132,6 +154,19 @@ export type PriceResult = {
 
     /** Any error message, or null if no error occurred */
     error: string | null
+}
+
+export type PriceV1Result = {
+    /** The market for which the price data is being fetched */
+    market: Market
+
+    /** The price details for the market or null if an error occurred */
+    price: PriceDetailsV1 | null
+
+    /** Any error message, or null if no error occurred */
+    error: string | null
+
+    v1: boolean
 }
 
 export type MarketError = {
@@ -329,6 +364,8 @@ export type ProviderMarketDataProps = {
      * duplicate. This information can be used for merging or filtering data.
      */
     duplicateOf?: { endpoints: string[], names: string[] }
+
+    showInSats: boolean
 }
 
 /**
@@ -361,6 +398,9 @@ export type MarketCards = {
      * the assets and markets being displayed.
      */
     esplora: string
+
+    v1: boolean | undefined
+    showInSats: boolean
 }
 
 // Die `AssetDetailsProps`-Schnittstelle beschreibt die Eigenschaften, die an eine Komponente übergeben werden,
@@ -467,6 +507,12 @@ type Fee = {
     }
 }
 
+type FeeV1 = {
+    basisPoint: string
+    fixed: { baseFee: string, quoteFee: string}
+}
+
+
 /**
  * Market represents a market structure, specifying base/quote assets and associated fees.
  */
@@ -481,6 +527,18 @@ export type Market = {
     fee: Fee
 
     market?: Market
+}
+
+export type MarketV1 = {
+    market: {
+        /** The base asset in the market */
+        baseAsset: string
+
+        /** The quote asset in the market */
+        quoteAsset: string
+    }
+    /** Fees applicable for trades in the market */
+    fee: FeeV1
 }
 
 /**

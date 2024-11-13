@@ -2,9 +2,9 @@
 
 import ProviderDashboard from "@/components/ProviderDashboard"
 import { ToggleTheme } from "@/components/ToggleTheme"
-import { VortexBackground } from "@/components/VortexBackground"
 import Link from "next/link"
 import Image from "next/image"
+import { Footer } from "@/components/Footer"
 
 // Extracted components for better readability and maintainability
 const WelcomeMessage = () => (
@@ -60,8 +60,8 @@ export default function Home() {
         <ProviderDashboard />
       </div>
 
-       {/* Vortex Background (bottom absolute) */}
-      <VortexBackground />
+       {/* Footer (bottom absolute) */}
+      <Footer />
     </main>
   )
 }

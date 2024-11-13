@@ -169,15 +169,32 @@ export const fetchMarketData = async (endpoint: string, path: string, body?: Mar
             return { error: `SSL error on ${url}: ${errorMessage} for ${JSON.stringify(body)}` }
         }
 
-        // Handle server errors (status 500)
         if (response.status === 500) {
             errorMessage = await response.text()
             console.error(`Server error on ${url}: ${errorMessage}`)
             return { error: `Server error on ${url}: ${errorMessage} for ${JSON.stringify(body)}` }
         }
 
-        // Handle other unsuccessful response statuses
-        if (!response.ok) {
+        if (response.status === 404) {
+            try {
+                const urlV1: string = getProxyUrl(`${endpoint}/v1${path}`)
+                const responseV1: Response = await fetch(urlV1, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: body ? JSON.stringify(body) : undefined,
+                })
+                const responseV1Data: MarketResults = responseV1.ok ? await responseV1.json() : await responseV1.text()
+                
+                if (typeof responseV1Data === 'string') {
+                    console.error(`Error fetching data from v1: ${responseV1Data}`)
+                    return { error: `Failed to fetch data from ${urlV1}. Error: ${responseV1Data}`, url: urlV1 }
+                }
+                return { data: responseV1Data, endpoint}
+            } catch (errorV1) {
+                console.error(`Error fetching from v1 URL: ${errorV1}`)
+                return { error: `Error fetching data from v1 endpoint: ${errorV1}`, endpoint }
+            }
+        } else if (!response.ok) {
             errorMessage = await response.text()
             console.error(`Error fetching data from ${url}. Status: ${response.status}. Error: ${errorMessage}`)
             return { error: `Failed to fetch data from ${url}. Status: ${response.status}. Error: ${errorMessage}`, url }

@@ -1,6 +1,6 @@
 // components/MarketDataCard.tsx
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { AssetDetailsProps, AssetInfo, MarketCards as MarketCardProps } from '@/types/types'
 import CustomToltip from './CustomTooltip'
@@ -8,7 +8,8 @@ import { ChartCandlestickIcon, CircleArrowDown, Currency, HandCoins, LinkIcon, S
 import { InfoCircledIcon } from '@radix-ui/react-icons'
 import { formatAsPercentage, formatDecimals } from '@/lib/utils'
 
-const MarketCards = ({ marketData, assetData, esplora }: MarketCardProps) => {
+const MarketCards = ({ marketData, assetData, esplora, v1, showInSats }: MarketCardProps) => {
+  
   return marketData.length > 0 ? (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {marketData.map((data, index) => {
@@ -23,7 +24,7 @@ const MarketCards = ({ marketData, assetData, esplora }: MarketCardProps) => {
         const quoteAssetMemStats: JSON | [] = quoteAssetInfo ? quoteAssetInfo.mempool_stats : []
 
         return (
-          <div key={index} className="p-4 border border-accent rounded-md shadow-sm space-y-4 bg-accent/50">
+          <div key={index} className={`p-4 border border-accent rounded-md shadow-sm drop-shadow-md space-y-4 ${v1 ? 'bg-orange-300/50 dark:bg-orange-600/50': typeof v1 === undefined ? 'bg-red-300 dark:bg-red-600' : 'bg-accent/50' }`}>
             <AssetDetails
               assetType="Base"
               asset={data.baseAsset}
@@ -47,6 +48,7 @@ const MarketCards = ({ marketData, assetData, esplora }: MarketCardProps) => {
               balances={data.balances}
               baseAssetPrecision={baseAssetPrecision}
               quoteAssetPrecision={quoteAssetPrecision}
+              showInSats={showInSats}
             />
             <FeeInfo
               baseAssetName={baseAssetName}
@@ -124,6 +126,7 @@ type BalanceInfoProps = {
   balances: { baseAmount: string; quoteAmount: string } | null
   baseAssetPrecision: number
   quoteAssetPrecision: number
+  showInSats: boolean
 }
 
 const BalanceInfo = ({
@@ -132,27 +135,70 @@ const BalanceInfo = ({
   balances,
   baseAssetPrecision,
   quoteAssetPrecision,
-}: BalanceInfoProps) => (
-  <div className="bg-accent/20 rounded-lg shadow-sm p-4 text-center">
-    <div className="font-bold flex justify-center">
-      <Scale className="mr-2" />
-      <CustomToltip
-        trigger={<>Balances<InfoCircledIcon className="h-3" /></>}
-        content={<p>These are the balances</p>}
-      />
+  showInSats
+}: BalanceInfoProps) => {
+  const [baseAmount, setBaseAmount] = useState<string>()
+  const [quoteAmount, setQuoteAmount] = useState<string>()
+
+  useEffect(() => {
+    const formatAssetAmount = () => {
+      const formatWithThousandsSeparator = (amount: string) => {
+        return new Intl.NumberFormat('en-US').format(parseFloat(amount))
+      }
+  
+      if (showInSats && baseAssetName === 'L-BTC' && quoteAssetName === 'L-BTC') {
+        const amount = balances ? formatDecimals(balances.baseAmount, baseAssetPrecision) : 'N/A'
+        const satsAmount = formatWithThousandsSeparator((parseFloat(amount) * 100000000).toString()) + ' sats'
+        const amountQ = balances ? formatDecimals(balances.quoteAmount, quoteAssetPrecision) : 'N/A'
+        const satsAmountQ = formatWithThousandsSeparator((parseFloat(amountQ) * 100000000).toString()) + ' sats'
+        setBaseAmount(satsAmount)
+        setQuoteAmount(satsAmountQ)
+      } else if (showInSats && baseAssetName === 'L-BTC' && quoteAssetName !== 'L-BTC') {
+        const amount = balances ? formatDecimals(balances.baseAmount, baseAssetPrecision) : 'N/A'
+        const satsAmount = formatWithThousandsSeparator((parseFloat(amount) * 100000000).toString()) + ' sats'
+        const amountQ = balances ? formatDecimals(balances.quoteAmount, quoteAssetPrecision) : 'N/A'
+        setBaseAmount(satsAmount)
+        setQuoteAmount(amountQ)
+      } else if (showInSats && quoteAssetName === 'L-BTC' && baseAssetName !== 'L-BTC') {
+        const amount = balances ? formatDecimals(balances.baseAmount, baseAssetPrecision) : 'N/A'
+        const amountQ = balances ? formatDecimals(balances.quoteAmount, quoteAssetPrecision) : 'N/A'
+        const satsAmountQ = formatWithThousandsSeparator((parseFloat(amountQ) * 100000000).toString()) + ' sats'
+        setBaseAmount(amount)
+        setQuoteAmount(satsAmountQ)
+      } else {
+        const amount = balances ? formatDecimals(balances.baseAmount, baseAssetPrecision) : 'N/A'
+        const amountQ = balances ? formatDecimals(balances.quoteAmount, quoteAssetPrecision) : 'N/A'
+        setBaseAmount(amount)
+        setQuoteAmount(amountQ)
+      }
+    }
+  
+    formatAssetAmount()
+  }, [showInSats, balances, baseAssetName, quoteAssetName, baseAssetPrecision, quoteAssetPrecision])
+  
+  
+  return (
+    <div className="bg-accent/20 rounded-lg shadow-sm p-4 text-center">
+      <div className="font-bold flex justify-center">
+        <Scale className="mr-2" />
+        <CustomToltip
+          trigger={<>Balances<InfoCircledIcon className="h-3" /></>}
+          content={<p>These are the balances</p>}
+        />
+      </div>
+      <span className="flex items-center justify-around space-x-4">
+        <p>
+          <strong>{baseAssetName}</strong>
+          <br />{baseAmount}
+        </p>
+        <p>
+          <strong>{quoteAssetName}</strong>
+          <br />{quoteAmount}
+        </p>
+      </span>
     </div>
-    <span className="flex items-center justify-around space-x-4">
-      <p>
-        <strong>{baseAssetName}</strong>
-        <br />{balances ? formatDecimals(balances.baseAmount, baseAssetPrecision) : 'N/A'}
-      </p>
-      <p>
-        <strong>{quoteAssetName}</strong>
-        <br />{balances ? formatDecimals(balances.quoteAmount, quoteAssetPrecision) : 'N/A'}
-      </p>
-    </span>
-  </div>
-)
+  )
+}
 
 type FeeInfoProps = {
   baseAssetName: string

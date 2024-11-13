@@ -2,15 +2,51 @@
 
 ![TDEX Explorer Logo](https://github.com/RayRizzling/tdex-explorer/blob/master/public/logo.svg)
 
+## 📑 Table of Contents
+
+1. [About TDEX Explorer](#about-tdex-explorer)
+2. [🚀 Key Features](#-key-features)
+3. [📄 Changelog](#-changelog)
+4. [🔑 Core Functionalities](#-core-functionalities)
+   1. [1. Fetching TDEX Data](#1-fetching-tdex-data)
+   2. [2. Displaying and Filtering Provider Data](#2-displaying-and-filtering-provider-data)
+   3. [3. Provider Interaction](#3-provider-interaction)
+   4. [4. Market Balance Management](#4-market-balance-management)
+   5. [5. Customizable Dashboards](#5-customizable-dashboards)
+   6. [6. Asset and Token Tracking](#6-asset-and-token-tracking)
+   7. [7. Decentralized & Self-Hosted](#7-decentralized--self-hosted)
+   8. [8. Data Visualization](#8-data-visualization)
+5. [💻 Getting Started](#-getting-started)
+   1. [🛠️ Prerequisites](#-prerequisites)
+   2. [🔧 Installation](#-installation)
+   3. [📦 Build for Production](#-build-for-production)
+6. [⚙️ Technologies Used](#-technologies-used)
+7. [📚 Documentation](#-documentation)
+   1. [Code Documentation Approach](#code-documentation-approach)
+8. [🛠️ Contributing](#-contributing)
+9. [🌍 Community and Support](#-community-and-support)
+10. [📄 License](#-license)
+11. [Supported by](#supported-by)
+
+---
+
+### About TDEX Explorer
+
 Welcome to **TDEX Explorer**, an open-source initiative designed to foster user-centered development of the TDEX network. This repository serves as a core codebase for building and managing the **TDEX Dashboard**, a user-friendly interface for exploring and interacting with TDEX. 
 
 Our mission with `tdex-explorer` is to empower every user to deploy their own dashboard instance, promoting a decentralized approach without reliance on centralized providers. This means **low-cost deployment** and **self-hosted freedom**—any user can independently host their dashboard, avoiding high server costs or complex infrastructure requirements.
+
+...
 
 ## 🚀 Key Features
 
 - **User-Centric Development**: Prioritizes user needs in expanding and interacting with the TDEX ecosystem.
 - **Open Access**: Allows anyone to set up, deploy, and maintain their own dashboard instance, providing full control over their data and interactions.
 - **Decentralized Operation**: No dependency on centralized service providers, ensuring a cost-effective and scalable solution for all users.
+
+## 📄 Changelog
+
+For a detailed list of all notable changes to this project, please refer to the [CHANGELOG.md](CHANGELOG.md).
 
 ## 🔑 Core Functionalities
 
@@ -147,7 +183,7 @@ Join the TDEX community on [Telegram](https://t.me/tdexnetwork) to discuss this 
 
 ### 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for more information.
 
 ---
 

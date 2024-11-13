@@ -2,7 +2,7 @@
 
 'use client'
 
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react'
+import React, { createContext, useState, useContext, ReactNode } from 'react'
 import { Provider, ErrorObject, ResultObject, ProviderContextType, FetchResult } from "@/types/types"
 import { fetchProviders, fetchMarketBalances } from "@/lib/fetchFunctions"
 import { fetchAllAssetsData } from "@/lib/actions"

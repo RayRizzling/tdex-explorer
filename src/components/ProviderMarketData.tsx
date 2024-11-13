@@ -17,6 +17,7 @@ import { Badge } from "./ui/badge"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card"
 import MarketCards from "./MarketCards"
 import ErrorCard from "./ErrorCard"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
 
 const renderDuplicateList = (endpoints: string[], names: string[]) => {
   return (
@@ -50,16 +51,61 @@ const ProviderMarketData: React.FC<ProviderMarketDataProps> = ({
   assetData,
   error,
   isDuplicate,
-  duplicateOf
+  duplicateOf, 
+  showInSats
 }) => {
   const onion = isOnion(endpoint)
+  const v1Statuses: (boolean | undefined)[] = marketData.flat().map((market) => market.v1)
+  const v1: boolean | undefined =
+  v1Statuses.every((status) => status === true)
+    ? true
+    : v1Statuses.every((status) => status === false)
+    ? false
+    : undefined
 
   return (
     <Card className="my-4 w-full border-ring">
       <CardHeader>
+        {v1 && 
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="flex gap-1 cursor-help">
+                <Badge className="italic w-fit bg-orange-300 dark:bg-orange-600 text-accent-foreground">
+                  Provider uses V1
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg p-2 text-sm">
+                <div className="text-center">
+                  <p className="font-bold text-destructive">This provider is using an outdated version (V1), which may limit compatibility.</p>
+                  <p>Trading with this provider using the TDEX app or other V2-compatible clients is not supported.</p>
+                  <p>It is strongly recommended for the provider to update to the latest TDEX version.</p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        }
+        {typeof v1 === undefined && 
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="flex gap-1 cursor-help">
+                <Badge className="italic w-fit bg-red-300 dark:bg-red-600 text-accent-foreground">
+                  Provider version unresolved!
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg p-2 text-sm">
+              <div className="text-center">
+                <p className="font-bold text-destructive">Inconsistent provider version detected!</p>
+                <p>Market data for this provider indicates a mix of different versions, which is a serious issue.</p>
+                <p>Trading with this provider is <span className="font-bold">not recommended</span> as version conflicts may cause unexpected behavior or compatibility issues.</p>
+                <p>It is highly advised for the provider to resolve this by updating to a consistent version.</p>
+              </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        }
         <CardTitle className="text-center text-xl truncate w-full">
             <p>{providerName}</p>
-            <div className="mt-2">{onion && (<Badge className="w-fit bg-destructive text-destructive-foreground/80"><EyeOff className="mr-2"/> Onion Provider</Badge>)}</div>
+            <div className="mt-2">{onion && (<Badge className="w-fit bg-destructive text-destructive-foreground/80 cursor-default"><EyeOff className="mr-2"/> Onion Provider</Badge>)}</div>
         </CardTitle>
         <CardDescription className="text-center text-sm truncate w-full">{endpoint}</CardDescription>
         {isDuplicate && (
@@ -80,7 +126,7 @@ const ProviderMarketData: React.FC<ProviderMarketDataProps> = ({
         <CardContent>
 
           {/* Main content with market data */}
-          <MarketCards marketData={marketData} assetData={assetData} esplora={esplora}/>
+          <MarketCards marketData={marketData} assetData={assetData} esplora={esplora} v1={v1} showInSats={showInSats}/>
 
           {/* Section for error display and fix tips */}
           {error && <ErrorCard error={error} endpoint={endpoint} />}

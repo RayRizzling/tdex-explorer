@@ -3,6 +3,9 @@
 export const DEFAULT_THEME = 'dark' // Default theme for the dashboard (dark or light)
 export const DEFAULT_LANGUAGE: string = 'en' // Default language for the UI
 export const debug: boolean = false // true = run with debug logs
+export const btcAddress: string = "bc1q94ukzpqz62efpw900sht88rrcct2v5grc5qn8z" // bitcoin donation address
+export const btcLiquidAddress: string = 'lq1qq2yl2werxx205634jj7el4uu4jk8jf48dtj0c82qjwnsphscxg35wpjhywm58e4wlcxer0r7g8vp8j03mv4nkp520e5alcyh0' // liquid bitcoin donation address
+export const lightningAddress: string = "lnurl1dp68gurn8ghj7ampd3kx2ar0veekzar0wd5xjtnrdakj7tnhv4kxctttdehhwm30d3h82unvwqhhxarfvekx2erww46rjwqsgw7fd" // lightning donation address
 
 /**
  * Default Blockstream Liquid Explorer URL for fetching asset data.
