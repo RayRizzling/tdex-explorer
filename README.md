@@ -17,7 +17,7 @@
    7. [7. Decentralized & Self-Hosted](#7-decentralized--self-hosted-)
    8. [8. Data Visualization](#8-data-visualization-)
 5. [💻 Getting Started](#-getting-started)
-   1. [🛠️ Prerequisites](%EF%B8%8F-prerequisites)
+   1. [🛠️ Prerequisites](#%EF%B8%8F-prerequisites)
    2. [🔧 Installation](#-installation)
    3. [📦 Build for Production](#-build-for-production)
 6. [⚙️ Technologies Used](%EF%B8%8F-technologies-used)
