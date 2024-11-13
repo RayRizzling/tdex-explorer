@@ -2,8 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] - **Version 1.1.0**
-_Released: [Date]_
+## [Released] - **Version 1.1.0**
+_Released: 2024-11-13_
 
 ### Added Features
 - 🚀 **Support for TDEX v1 Providers**: Added support for providers using the outdated TDEX v1 version, along with warning messages when a provider uses TDEX v1.

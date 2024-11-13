@@ -395,6 +395,16 @@ function isPriceV1Result(result: PriceResult | PriceV1Result): result is PriceV1
   return (result as PriceV1Result).price?.balance?.balance !== undefined
 }
 
+/**
+ * Type guard function to check if a given price result is of type PriceV1Result based on the presence of the `v1` property.
+ * 
+ * This function verifies whether the provided `result` is of type `PriceV1Result` by checking for the existence 
+ * of the `v1` property. If the `v1` property is found on the `result`, it signifies that the object conforms to the 
+ * `PriceV1Result` type.
+ * 
+ * @param {PriceResult | PriceV1Result} result - The price result object to check.
+ * @returns {result is PriceV1Result} Returns true if the result is of type PriceV1Result based on the presence of the `v1` property.
+ */
 function isV1Result(result: PriceResult | PriceV1Result): result is PriceV1Result {
   return (result as PriceV1Result).v1 !== undefined
 }

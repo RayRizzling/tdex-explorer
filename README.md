@@ -8,22 +8,22 @@
 2. [🚀 Key Features](#-key-features)
 3. [📄 Changelog](#-changelog)
 4. [🔑 Core Functionalities](#-core-functionalities)
-   1. [1. Fetching TDEX Data](#1-fetching-tdex-data)
-   2. [2. Displaying and Filtering Provider Data](#2-displaying-and-filtering-provider-data)
-   3. [3. Provider Interaction](#3-provider-interaction)
-   4. [4. Market Balance Management](#4-market-balance-management)
-   5. [5. Customizable Dashboards](#5-customizable-dashboards)
-   6. [6. Asset and Token Tracking](#6-asset-and-token-tracking)
-   7. [7. Decentralized & Self-Hosted](#7-decentralized--self-hosted)
-   8. [8. Data Visualization](#8-data-visualization)
+   1. [1. Fetching TDEX Data](#1-fetching-tdex-data-)
+   2. [2. Displaying and Filtering Provider Data](#2-displaying-and-filtering-provider-data-)
+   3. [3. Provider Interaction](#3-provider-interaction-)
+   4. [4. Market Balance Management](#4-market-balance-management-)
+   5. [5. Customizable Dashboards](#5-customizable-dashboards-)
+   6. [6. Asset and Token Tracking](#6-asset-and-token-tracking-)
+   7. [7. Decentralized & Self-Hosted](#7-decentralized--self-hosted-)
+   8. [8. Data Visualization](#8-data-visualization-)
 5. [💻 Getting Started](#-getting-started)
-   1. [🛠️ Prerequisites](#-prerequisites)
+   1. [🛠️ Prerequisites](%EF%B8%8F-prerequisites)
    2. [🔧 Installation](#-installation)
    3. [📦 Build for Production](#-build-for-production)
-6. [⚙️ Technologies Used](#-technologies-used)
+6. [⚙️ Technologies Used](%EF%B8%8F-technologies-used)
 7. [📚 Documentation](#-documentation)
    1. [Code Documentation Approach](#code-documentation-approach)
-8. [🛠️ Contributing](#-contributing)
+8. [🛠️ Contributing](%EF%B8%8F-contributing)
 9. [🌍 Community and Support](#-community-and-support)
 10. [📄 License](#-license)
 11. [Supported by](#supported-by)
@@ -183,7 +183,7 @@ Join the TDEX community on [Telegram](https://t.me/tdexnetwork) to discuss this 
 
 ### 📄 License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for more information.
+This project is licensed under the MIT License. See [LICENSE](LICENSE.md) for more information.
 
 ---
 
