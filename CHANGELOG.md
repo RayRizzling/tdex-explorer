@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Released] - **Version 1.1.1**
+_Released: 2024-11-14_
+
+### Bug Fixes
+- 🐞 **Provider Market Data Warning**: Fixed an issue where a version warning was incorrectly displayed during provider data fetches. This issue occurred when a fetch returned a bad request error, which was mistakenly interpreted as a version incompatibility.
+
+---
+
 ## [Released] - **Version 1.1.0**
 _Released: 2024-11-13_
 

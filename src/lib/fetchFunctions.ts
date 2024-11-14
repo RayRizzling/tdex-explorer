@@ -176,6 +176,7 @@ export const fetchMarketData = async (endpoint: string, path: string, body?: Mar
         }
 
         if (response.status === 404) {
+
             try {
                 const urlV1: string = getProxyUrl(`${endpoint}/v1${path}`)
                 const responseV1: Response = await fetch(urlV1, {
@@ -187,7 +188,8 @@ export const fetchMarketData = async (endpoint: string, path: string, body?: Mar
                 
                 if (typeof responseV1Data === 'string') {
                     console.error(`Error fetching data from v1: ${responseV1Data}`)
-                    return { error: `Failed to fetch data from ${urlV1}. Error: ${responseV1Data}`, url: urlV1 }
+                    const responseData = await response.text()
+                    return { error: `Tried to fetch data from ${url} and ${urlV1}. Error on ${url}: ${responseData}. Error on ${urlV1}: ${responseV1Data}`, url: url }
                 }
                 return { data: responseV1Data, endpoint}
             } catch (errorV1) {
